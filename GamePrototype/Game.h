@@ -1,5 +1,6 @@
 #pragma once
 #include "BaseGame.h"
+#include "Vector2f.h"
 class Game : public BaseGame
 {
 public:
@@ -22,7 +23,9 @@ public:
 	void ProcessMouseUpEvent( const SDL_MouseButtonEvent& e ) override;
 
 private:
-
+	Point2f m_Position;
+	Vector2f m_Velocity;
+	bool m_Bool;
 	// FUNCTIONS
 	void Initialize();
 	void Cleanup( );
