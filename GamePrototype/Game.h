@@ -1,6 +1,11 @@
 #pragma once
 #include "BaseGame.h"
 #include "Vector2f.h"
+#include "vector"
+#include "Texture.h"
+
+class Bones;
+class Bomb;
 class Game : public BaseGame
 {
 public:
@@ -23,11 +28,24 @@ public:
 	void ProcessMouseUpEvent( const SDL_MouseButtonEvent& e ) override;
 
 private:
-	Point2f m_Position;
 	Vector2f m_Velocity;
-	bool m_Bool;
+	Point2f m_Position;
+	Rectf m_Hitbox;
+	bool m_IsDead;
+	float m_Timer;
+	int m_Score;
+
+	Texture* m_pText;
+	Texture* m_pGameOver;
+	Texture* m_pGameOver2;
+
+	std::vector<Bones*> m_Bones;
+	std::vector<Bomb*> m_Bombs;
+
 	// FUNCTIONS
 	void Initialize();
 	void Cleanup( );
 	void ClearBackground( ) const;
+	void CreateObject();
+	void ResetGame();
 };
