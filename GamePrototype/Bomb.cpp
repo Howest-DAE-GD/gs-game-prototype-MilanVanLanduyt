@@ -2,7 +2,7 @@
 #include "Bomb.h"
 #include "utils.h"
 
-float Bomb::m_MAXTIME{ 2.f };
+float Bomb::m_MAXTIME{ 1.f };
 
 Bomb::Bomb(float viewportWidth, float viewportHeigth)
 	: m_Radius{ 25.f }

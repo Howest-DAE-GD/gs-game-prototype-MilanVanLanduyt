@@ -32,15 +32,21 @@ private:
 	Point2f m_Position;
 	Rectf m_Hitbox;
 	bool m_IsDead;
+	bool m_TimeEnded;
 	float m_Timer;
+	int m_GameTimer;
+	float m_GameTimerPrecise;
 	int m_Score;
 
 	Texture* m_pText;
 	Texture* m_pGameOver;
 	Texture* m_pGameOver2;
+	Texture* m_pTimeEnded;
+	Texture* m_pTimer;
 
 	std::vector<Bones*> m_Bones;
 	std::vector<Bomb*> m_Bombs;
+	std::vector<int> m_HighScores;
 
 	// FUNCTIONS
 	void Initialize();

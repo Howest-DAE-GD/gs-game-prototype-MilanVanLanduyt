@@ -2,7 +2,7 @@
 #include "Bones.h"
 #include "utils.h"
 
-float Bones::m_MAXTIME{ 4.f };
+float Bones::m_MAXTIME{ 2.5f };
 
 Bones::Bones(float viewportWidth, float viewportHeigth)
 	: m_Radius{ 25.f }
