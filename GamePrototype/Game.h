@@ -6,6 +6,7 @@
 
 class Bones;
 class Bomb;
+class SpecialBomb;
 class Game : public BaseGame
 {
 public:
@@ -43,9 +44,11 @@ private:
 	Texture* m_pGameOver2;
 	Texture* m_pTimeEnded;
 	Texture* m_pTimer;
+	Texture* m_pInfoText;
 
 	std::vector<Bones*> m_Bones;
 	std::vector<Bomb*> m_Bombs;
+	std::vector<SpecialBomb*> m_SpecialBombs;
 	std::vector<int> m_HighScores;
 
 	// FUNCTIONS
@@ -54,4 +57,5 @@ private:
 	void ClearBackground( ) const;
 	void CreateObject();
 	void ResetGame();
+	void CreateSpecialBombs(int spawnChance);
 };

@@ -1,8 +1,8 @@
 #pragma once
-class Bomb
+class SpecialBomb
 {
 public:
-	explicit Bomb(float viewportWidth, float viewportHeigth);
+	explicit SpecialBomb(float viewportWidth, float viewportHeigth);
 
 	void Draw() const;
 	void Update(float elapsedSec);

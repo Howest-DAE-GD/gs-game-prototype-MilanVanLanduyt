@@ -4,7 +4,8 @@
 #include "Bones.h"
 #include "Bomb.h"
 #include "utils.h"
-using namespace utils;
+#include "SpecialBomb.h"
+//using namespace utils;
 
 Game::Game( const Window& window ) 
 	:BaseGame{ window }
@@ -34,6 +35,7 @@ void Game::Initialize( )
 	m_pGameOver2 = new Texture("Press R to restart", "DIN-Light.otf", 40.f, Color4f{ 0.f, 0.f, 0.f, 1.f });
 	m_pTimer = new Texture("Time left: " + std::to_string(m_GameTimer), "DIN-Light.otf", 40.f, Color4f{ 1.f, 1.f, 1.f, 1.f });
 	m_pTimeEnded = new Texture("TIME ENDED", "DIN-Light.otf", 140.f, Color4f{ 0.f, 0.f, 0.f, 1.f });
+	m_pInfoText = new Texture("Use arrows to move, press space to catch a bone( stops speed)", "DIN-Light.otf", 20.f, Color4f{ 1.f, 1.f, 1.f, 1.f });
 }
 
 void Game::Cleanup( )
@@ -48,6 +50,11 @@ void Game::Cleanup( )
 		delete m_Bombs[idx];
 		m_Bombs[idx] = nullptr;
 	}
+	for (int idx{}; idx < m_SpecialBombs.size(); ++idx)
+	{
+		delete m_SpecialBombs[idx];
+		m_SpecialBombs[idx] = nullptr;
+	}
 
 	delete m_pText;
 	m_pText = nullptr;
@@ -59,6 +66,8 @@ void Game::Cleanup( )
 	m_pTimer = nullptr;
 	delete m_pTimeEnded;
 	m_pTimeEnded = nullptr;
+	delete m_pInfoText;
+	m_pInfoText = nullptr;
 }
 
 void Game::Update( float elapsedSec )
@@ -88,16 +97,19 @@ void Game::Update( float elapsedSec )
 		else if (m_GameTimer >= 40 && m_GameTimer < 50 && m_Timer >= 0.5f)
 		{
 			CreateObject();
+			CreateSpecialBombs(20);
 			m_Timer = 0;
 		}
 		else if (m_GameTimer >= 25 && m_GameTimer < 40 && m_Timer >= 0.2f)
 		{
 			CreateObject();
+			CreateSpecialBombs(7);
 			m_Timer = 0;
 		}
 		else if (m_GameTimer < 25 && m_Timer >= 0.05f)
 		{
 			CreateObject();
+			CreateSpecialBombs(15);
 			m_Timer = 0;
 		}
 		else if (m_GameTimer <= 0)
@@ -155,6 +167,49 @@ void Game::Update( float elapsedSec )
 				}
 			}
 		}
+
+		for (int idx{}; idx < m_SpecialBombs.size(); ++idx)
+		{
+			if (m_SpecialBombs[idx] != nullptr)
+			{
+				m_SpecialBombs[idx]->CollisionDetection(m_Hitbox);
+				if (m_SpecialBombs[idx]->CollisionDetection(m_Hitbox))
+				{
+					m_IsDead = true;
+					m_HighScores.push_back(m_Score);
+					std::cout << "-- HIGHSCORES --\n";
+					for (int idx{}; idx < m_HighScores.size(); ++idx)
+					{
+						std::cout << "Score " << idx + 1 << ": " << m_HighScores[idx] << "\n";
+					}
+					std::cout << std::endl;
+				}
+				m_SpecialBombs[idx]->Update(elapsedSec);
+				if (m_SpecialBombs[idx]->IsDestroyed())
+				{
+					delete m_SpecialBombs[idx];
+					m_SpecialBombs[idx] = nullptr;
+				}
+			}
+		}
+
+
+		if (m_Position.x < 0 )
+		{
+			m_Position.x = GetViewPort().width;
+		}
+		if (m_Position.x > GetViewPort().width)
+		{
+			m_Position.x = 0;
+		}
+		if (m_Position.y < 0)
+		{
+			m_Position.y = GetViewPort().height;
+		}
+		if (m_Position.y > GetViewPort().height)
+		{
+			m_Position.y = 0;
+		}
 	}		
 }
 
@@ -164,6 +219,7 @@ void Game::Draw( ) const
 
 	m_pTimer->Draw(Point2f{ 50.f, GetViewPort().height - 45.f });
 	m_pText->Draw(Point2f{ GetViewPort().width / 2 - 55.f, GetViewPort().height - 45.f });
+	m_pInfoText->Draw(Point2f{ GetViewPort().width / 2 - 250.f, GetViewPort().height - 60.f });
 
 	for (int idx{}; idx < m_Bones.size(); ++idx)
 	{
@@ -181,13 +237,21 @@ void Game::Draw( ) const
 		}
 	}
 	
+	for (int idx{}; idx < m_SpecialBombs.size(); ++idx)
+	{
+		if (m_SpecialBombs[idx] != nullptr)
+		{
+			m_SpecialBombs[idx]->Draw();
+		}
+	}
+
 	if (!m_IsDead)
 	{
 
-		SetColor(Color4f{ 1.f, 1.f, 1.f, 1.f });
+		utils::SetColor(Color4f{ 1.f, 1.f, 1.f, 1.f });
 
 		//DrawRect(m_Position, 25.f, 50.f, 2.f);
-		FillEllipse(Point2f{ m_Position.x + 12.5f, m_Position.y + 40.f }, 5.f, 5.f);
+		utils::FillEllipse(Point2f{ m_Position.x + 12.5f, m_Position.y + 40.f }, 5.f, 5.f);
 		utils::DrawLine(Point2f{ m_Position.x + 12.5f, m_Position.y + 40.f }, Point2f{ m_Position.x + 12.5f, m_Position.y + 20.f }, 2.f);
 		utils::DrawLine(Point2f{ m_Position.x + 5.f, m_Position.y + 6.f }, Point2f{ m_Position.x + 12.5f, m_Position.y + 20.f }, 2.f);
 		utils::DrawLine(Point2f{ m_Position.x + 20.f, m_Position.y + 6.f }, Point2f{ m_Position.x + 12.5f, m_Position.y + 20.f }, 2.f);
@@ -306,6 +370,16 @@ void Game::CreateObject()
 	{
 		m_Bombs.push_back(new Bomb(GetViewPort().width, GetViewPort().height));
 		//std::cout << "New Bomb created!" << std::endl;
+		//m_SpecialBombs.push_back(new SpecialBomb(GetViewPort().width, GetViewPort().height));
+	}
+}
+
+void Game::CreateSpecialBombs(int spawnChance)
+{
+	int random{ rand() % spawnChance };
+	if (random == spawnChance / 2)
+	{
+		m_SpecialBombs.push_back(new SpecialBomb(GetViewPort().width, GetViewPort().height));
 	}
 }
 
@@ -321,6 +395,12 @@ void Game::ResetGame()
 	{
 		delete m_Bombs[idx];
 		m_Bombs[idx] = nullptr;
+	}
+
+	for (int idx{}; idx < m_SpecialBombs.size(); ++idx)
+	{
+		delete m_SpecialBombs[idx];
+		m_SpecialBombs[idx] = nullptr;
 	}
 
 	m_Score = 0;
